@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
-app=Flask(__name__)
+app = Flask(__name__)
 
+# /// = relative path, //// = absolute path
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,7 +23,7 @@ def home():
 @app.route("/add", methods=["POST"])
 def add():
     title = request.form.get("title")
-    new_todo= Todo(title=title, complete=False)
+    new_todo = Todo(title=title, complete=False)
     db.session.add(new_todo)
     db.session.commit()
     return redirect(url_for("home"))
@@ -35,7 +37,7 @@ def update(todo_id):
 
 @app.route("/delete/<int:todo_id>")
 def delete(todo_id):
-    todo=Todo.query.filter_by(id=todo_id).first()
+    todo = Todo.query.filter_by(id=todo_id).first()
     db.session.delete(todo)
     db.session.commit()
     return redirect(url_for("home"))
