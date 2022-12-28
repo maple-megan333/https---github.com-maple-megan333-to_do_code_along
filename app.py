@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
+
 app = Flask(__name__)
 
 # /// = relative path, //// = absolute path
@@ -14,11 +15,16 @@ class Todo(db.Model):
     title = db.Column(db.String(100))
     complete = db.Column(db.Boolean)
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
-@app.route('/')
+
+@app.route("/")
 def home():
-    todo_list=Todo.query.all()
+    todo_list = Todo.query.all()
     return render_template("base.html", todo_list=todo_list)
+
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -28,12 +34,14 @@ def add():
     db.session.commit()
     return redirect(url_for("home"))
 
+
 @app.route("/update/<int:todo_id>")
 def update(todo_id):
     todo = Todo.query.filter_by(id=todo_id).first()
     todo.complete = not todo.complete
     db.session.commit()
     return redirect(url_for("home"))
+
 
 @app.route("/delete/<int:todo_id>")
 def delete(todo_id):
@@ -42,8 +50,6 @@ def delete(todo_id):
     db.session.commit()
     return redirect(url_for("home"))
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     db.create_all()
     app.run(debug=True)
-
